@@ -11,6 +11,7 @@ class PlayerServiceTestCase(unittest.TestCase):
         """
         # Create an instance of the Flask app
         self.app = create_app()
+        self.app.config['TESTING'] = True
         self.client = self.app.test_client()
         self.app.testing = True
 
@@ -23,25 +24,48 @@ class PlayerServiceTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # Parse the response data
         data = json.loads(response.data)
-        # Assert the response is a list
+        # Assert the response
         self.assertIsInstance(data, list)
-        # Assert that each item in the response list is a dictionary
-        if len(data) > 0:
-            self.assertIsInstance(data[0], dict)
+        self.assertGreater(len(data), 0)
+        self.assertIsInstance(data[0], dict)
 
     def test_get_specific_player(self):
         """
         Test that the /api/players/<player_id> endpoint returns the correct 
         player data.
         """
-        player_id = 'aardsda01'
+        player_id = "aardsda01"
+        expected_player = {
+            "playerID": "aardsda01",
+            "birthYear": 1981,
+            "birthMonth": 12,
+            "birthDay": 27,
+            "birthCountry": "USA",
+            "birthState": "CO",
+            "birthCity": "Denver",
+            "deathYear": None,
+            "deathMonth": None,
+            "deathDay": None,
+            "deathCountry": None,
+            "deathState": None,
+            "deathCity": None,
+            "nameFirst": "David",
+            "nameLast": "Aardsma",
+            "nameGiven": "David Allan",
+            "weight": 215,
+            "height": 75,
+            "bats": "R",
+            "throws": "R",
+            "debut": "2004-04-06",
+            "finalGame": "2015-08-23",
+            "retroID": "aardd001",
+            "bbrefID": "aardsda01"
+        }
         response = self.client.get(f'/api/players/{player_id}')
         self.assertEqual(response.status_code, 200)
-        # Parse the response data
-        data = json.loads(response.data)
-        # Assert the response is a dictionary and contains expected keys
-        self.assertIsInstance(data, dict)
-        self.assertEqual(data['playerID'], player_id)
+        player_data = json.loads(response.data)
+        # Verify that every field matches the expected values
+        self.assertEqual(player_data, expected_player)
 
     def test_get_non_existent_player(self):
         """
@@ -51,10 +75,9 @@ class PlayerServiceTestCase(unittest.TestCase):
         response = self.client.get(f'/api/players/{player_id}')
         self.assertEqual(response.status_code, 404)
         # Parse the response data
-        data = json.loads(response.data)
+        error_message = json.loads(response.data)
         # Assert that an appropriate error message is returned
-        self.assertIn('error', data)
-        self.assertEqual(data['error'], 'Player not found')
+        self.assertEqual(error_message, {"error": "Player not found"})
 
 if __name__ == '__main__':
     unittest.main()

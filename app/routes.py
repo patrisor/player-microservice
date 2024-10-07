@@ -1,14 +1,8 @@
-import os
-import json
-import pandas as pd
+import sqlite3
 from flask import jsonify
+from app.config import DB_PATH
 
-# Load the CSV file at the start to keep data available throughout the service 
-# runtime
-DATA_PATH = os.path.join(os.path.dirname(__file__), '../data/Player.csv')
-players_df = pd.read_csv(DATA_PATH)
-
-def register_routes(app):
+def register_routes(app, cache):
     """
     Register the REST API routes to the Flask application.
 
@@ -18,6 +12,7 @@ def register_routes(app):
     """
 
     @app.route('/api/players', methods=['GET'])
+    @cache.cached(timeout=60)  # Cache the result for 60 seconds
     def get_players():
         """
         Endpoint to retrieve all players.
@@ -25,12 +20,25 @@ def register_routes(app):
         Returns:
             JSON Response: A JSON list containing all players' data.
         """
-        # Convert the players DataFrame to a list of dictionaries
-        players = players_df.to_dict(orient='records')
+        # Connect to SQLite and fetch all players
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM players")
+            players = cursor.fetchall()
+            # Get column names to construct response dictionaries
+            column_names = [
+                description[0]
+                for description
+                in cursor.description
+            ]
+            players_list = [
+                dict(zip(column_names, player)) for player in players
+            ]
         # Return the list as JSON with HTTP status code 200 (OK)
-        return jsonify(players), 200
+        return jsonify(players_list), 200
 
     @app.route('/api/players/<string:player_id>', methods=['GET'])
+    @cache.cached(timeout=60)  # Cache the result for 60 seconds
     def get_player(player_id):
         """
         Endpoint to retrieve a specific player by their ID.
@@ -42,12 +50,23 @@ def register_routes(app):
             JSON Response: A JSON object containing the player's data or an 
                            error message.
         """
-        # Filter the DataFrame for the row with the given player ID
-        player = players_df[players_df['playerID'] == player_id]
-        if not player.empty:
-            # If the player exists, convert the first (and only) row to a 
-            # dictionary and return it
-            return jsonify(player.iloc[0].to_dict()), 200
-        else:
-            # Return a 404 error if no player with the given ID is found
-            return jsonify({"error": "Player not found"}), 404
+        # Connect to SQLite and fetch player by ID
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM players WHERE playerID = ?", (player_id,)
+            )
+            player = cursor.fetchone()
+            if player:
+                # Get column names from the cursor description
+                column_names = [
+                    description[0]
+                    for description 
+                    in cursor.description
+                ]
+                # Combine column names with player data to create a dictionary
+                player_data = dict(zip(column_names, player))
+                return jsonify(player_data), 200
+            else:
+                # Return a 404 error if no player with the given ID is found
+                return jsonify({"error": "Player not found"}), 404
