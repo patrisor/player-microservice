@@ -12,7 +12,7 @@ def register_routes(app, cache):
     """
 
     @app.route('/api/players', methods=['GET'])
-    @cache.cached(timeout=60)  # Cache the result for 60 seconds
+    @cache.cached(timeout=60) # Cache the result of the method for 60 seconds
     def get_players():
         """
         Endpoint to retrieve all players.
@@ -31,6 +31,7 @@ def register_routes(app, cache):
                 for description
                 in cursor.description
             ]
+            # Combine column names with player data to create a dictionary
             players_list = [
                 dict(zip(column_names, player)) for player in players
             ]
@@ -38,7 +39,7 @@ def register_routes(app, cache):
         return jsonify(players_list), 200
 
     @app.route('/api/players/<string:player_id>', methods=['GET'])
-    @cache.cached(timeout=60)  # Cache the result for 60 seconds
+    @cache.memoize(timeout=60) # Memoize the result of the method for 60 seconds
     def get_player(player_id):
         """
         Endpoint to retrieve a specific player by their ID.

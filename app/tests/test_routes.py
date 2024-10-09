@@ -63,8 +63,8 @@ class PlayerServiceTestCase(unittest.TestCase):
         }
         response = self.client.get(f'/api/players/{player_id}')
         self.assertEqual(response.status_code, 200)
-        player_data = json.loads(response.data)
         # Verify that every field matches the expected values
+        player_data = json.loads(response.data)
         self.assertEqual(player_data, expected_player)
 
     def test_get_non_existent_player(self):
@@ -72,11 +72,11 @@ class PlayerServiceTestCase(unittest.TestCase):
         Test that requesting a non-existent player returns a 404 status code.
         """
         player_id = 'nonexistent01'
+        # Assert that the appropriate status code is returned
         response = self.client.get(f'/api/players/{player_id}')
         self.assertEqual(response.status_code, 404)
-        # Parse the response data
-        error_message = json.loads(response.data)
         # Assert that an appropriate error message is returned
+        error_message = json.loads(response.data)
         self.assertEqual(error_message, {"error": "Player not found"})
 
 if __name__ == '__main__':
