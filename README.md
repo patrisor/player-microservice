@@ -1,13 +1,13 @@
 # Player Microservice
 
 ## Overview
-The Player Microservice is a simple REST API built using Flask, which serves player data from a CSV file (`Player.csv`). It exposes two endpoints:
+The Player Microservice is a REST API built using Flask that serves player data from a CSV file (`Player.csv`). It exposes two endpoints:
 - `GET /api/players`: Fetches a list of all players.
 - `GET /api/players/<player_id>`: Fetches details of a specific player by their unique ID.
 
 ## Features
-- **List All Players**: Retrieve a list of all players with relevant details.
-- **Get Player by ID**: Retrieve information for a specific player using their unique identifier.
+- **List All Players**: Retrieve a complete list of players with relevant details.
+- **Get Player by ID**: Fetch detailed information about a specific player using their unique ID.
 
 ## Setup Instructions
 
@@ -15,7 +15,7 @@ The Player Microservice is a simple REST API built using Flask, which serves pla
 Start by cloning the repository to your local machine:
 
 ```sh
-git clone <repository-url>
+git clone https://github.com/patrisor/player-microservice.git
 cd player_microservice
 ```
 
@@ -35,7 +35,7 @@ Install the required packages listed in `requirements.txt`:
 pip install -r requirements.txt
 ```
 
-This command installs the following main dependencies:
+This installs the main dependencies:
 - **Flask**: A lightweight web framework for building REST APIs.
 - **pandas**: A powerful library for data manipulation, used to read and process the CSV file.
 
@@ -68,7 +68,7 @@ python -m app.main
   Replace `aardsda01` with the desired player ID.
 
 ### 6. Running Unit Tests
-Unit tests are provided to validate the core functionality of the microservice.
+Unit tests are provided to ensure the core functionality of the microservice works as expected.
 
 To run the tests:
 
@@ -80,14 +80,31 @@ This will:
 - Test the `/api/players` endpoint to ensure it returns all players.
 - Test the `/api/players/<player_id>` endpoint to verify it returns the correct player or a 404 error if the player does not exist.
 
-### 7. How to Customize
-- **Modify `Player.csv`**: You can update the `Player.csv` file in the `data/` directory to include additional players or modify the data.
-- **Add More Features**: Extend the `routes.py` to add more functionality, such as adding new players, updating details, or deleting players.
+### 7. Docker Deployment
+If you'd like to package the microservice as a Docker container, follow these steps:
+
+- Build the Docker Image:
+
+```sh
+docker build -t player-microservice .
+```
+
+- Run the Container:
+
+```sh
+docker run -p 5001:5001 player-microservice
+```
+
+### 8. How to Customize
+- **Modify `Player.csv`**: You can update the `Player.csv` file in the `data/` directory to include additional players or modify existing data.
+- **Extend the API**: Add new features, such as the ability to add, update, or delete players, by modifying the `routes.py` file.
 
 ## Technologies Used
 - **Python**: Primary language for building the microservice.
 - **Flask**: Lightweight web framework for RESTful APIs.
 - **pandas**: Library used to read and manipulate player data from a CSV file.
+- **Docker**: For containerizing the application.
+- **unittest**: Python’s built-in testing framework.
 
 ## License
 This project is licensed under the MIT License.

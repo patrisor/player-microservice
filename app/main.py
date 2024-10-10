@@ -61,4 +61,4 @@ if __name__ == '__main__':
     # Create an application instance and run the development server.
     app = create_app()
     # Start Flask development server that listens on all network interfaces.
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=False)

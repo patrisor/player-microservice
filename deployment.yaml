@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: player-microservice-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: player-microservice
+  template:
+    metadata:
+      labels:
+        app: player-microservice
+    spec:
+      containers:
+      - name: player-microservice
+        image: 875505375241.dkr.ecr.us-west-1.amazonaws.com/player-microservice:latest
+        ports:
+        - containerPort: 5001
